@@ -1,0 +1,23 @@
+[
+  {
+    "id": "product1",
+    "name": "Portable Blender",
+    "features": ["USB rechargeable", "6 stainless blades", "Easy to clean"],
+    "media": [
+      "https://your-host.com/image1.jpg",
+      "https://your-host.com/image2.jpg",
+      "https://your-host.com/demo1.mp4",
+      "https://your-host.com/demo2.mp4"
+    ]
+  },
+  {
+    "id": "product2",
+    "name": "LED Star Projector",
+    "features": ["Bluetooth speaker", "Multiple galaxy effects", "Remote control"],
+    "media": [
+      "https://your-host.com/star1.jpg",
+      "https://your-host.com/star2.jpg",
+      "https://your-host.com/star-demo.mp4"
+    ]
+  }
+]
