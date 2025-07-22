@@ -1,9 +1,12 @@
 {
   "name": "trend-reactor",
   "version": "1.0.0",
+  "type": "module",
   "dependencies": {
     "openai": "^4.0.0",
     "axios": "^1.4.0"
   },
-  "type": "module"
+  "engines": {
+    "node": "20.x"
+  }
 }
