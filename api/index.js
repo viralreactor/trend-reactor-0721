@@ -2,7 +2,7 @@ import { generateScript } from '../utils/generateScript.js';
 import { generateVideo } from '../utils/generateVideo.js';
 import { textToSpeech } from '../utils/textToSpeech.js';
 import { uploadToWebhook } from '../utils/uploadWebhook.js';
-import products from '../data/products.json';
+import products from '../data/products.json' assert { type: 'json' };
 
 export default async function handler(req, res) {
   try {
