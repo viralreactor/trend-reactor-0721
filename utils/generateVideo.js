@@ -1,46 +1,37 @@
-import { exec } from 'child_process';
-import fs from 'fs/promises';
-import cloudinary from 'cloudinary';
+const { v2: cloudinary } = require('cloudinary');
+const fs = require('fs/promises');
 
-// Cloudinary Config (Make sure you add these to Vercel env variables)
-cloudinary.v2.config({
+cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-export async function generateVideo(product, audioPath) {
-  const output = `/tmp/${product.id}-video.mp4`;
+async function generateVideo(product, audioPath) {
   const images = product.images;
 
-  if (!images || images.length === 0) {
-    throw new Error("Product must have at least one image in 'images' array");
-  }
+  // For simplicity, use the first image for now (upgrade later for full slideshow)
+  const image = images[0];
 
-  const inputImages = images.map((img, idx) => `-loop 1 -t 5 -i ${img}`).join(' ');
+  // Upload image to Cloudinary
+  const upload = await cloudinary.uploader.upload(image, { resource_type: "image" });
 
-  const zooms = images.map((_, idx) => 
-    `[${idx}:v]scale=1080:1920,zoompan=z='min(zoom+0.0015,1.1)':d=125,setsar=1[img${idx}]`
-  ).join('; ');
+  // Upload audio to Cloudinary
+  const audioBuffer = await fs.readFile(audioPath);
+  const audioBase64 = audioBuffer.toString('base64');
 
-  const concatInputs = images.map((_, idx) => `[img${idx}]`).join('');
-
-  const cmd = `
-    ffmpeg ${inputImages} -i ${audioPath} -filter_complex "${zooms}; ${concatInputs}concat=n=${images.length}:v=1:a=0[outv]" -map "[outv]" -map ${images.length}:a -y ${output}
-  `;
-
-  await new Promise((resolve, reject) => {
-    exec(cmd, (err, stdout, stderr) => {
-      if (err) reject(err);
-      else resolve();
-    });
+  const audioUpload = await cloudinary.uploader.upload(`data:audio/mp3;base64,${audioBase64}`, {
+    resource_type: "video"
   });
 
-  // Upload to Cloudinary
-  const result = await cloudinary.v2.uploader.upload(output, {
-    resource_type: 'video',
-    folder: 'trend-reactor-videos'
+  // Create simple Cloudinary video with image + audio overlay
+  const videoUrl = cloudinary.url(upload.public_id + ".jpg", {
+    resource_type: "video",
+    overlay: { url: audioUpload.secure_url },
+    transformation: [{ width: 720, crop: "scale" }]
   });
 
-  return result.secure_url;
+  return videoUrl;
 }
+
+module.exports = { generateVideo };
