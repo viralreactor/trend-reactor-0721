@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const audio = await textToSpeech(script);
     const videoUrl = await generateVideo(product, audio);
     await uploadToWebhook(product, script, videoUrl);
-    res.status(200).json({ message: 'Video created and sent to webhook successfully!' });
+    res.status(200).json({ message: 'Video created and sent successfully!', video: videoUrl });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
