@@ -1,9 +1,11 @@
-import axios from 'axios';
+const axios = require('axios');
 
-export async function uploadToWebhook(product, script, videoUrl) {
+async function uploadToWebhook(product, script, videoUrl) {
   await axios.post(process.env.WEBHOOK_URL, {
     product: product.name,
     caption: script,
-    video: videoUrl,
+    video: videoUrl
   });
 }
+
+module.exports = { uploadToWebhook };
