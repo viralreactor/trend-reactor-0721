@@ -1,16 +1,20 @@
-import OpenAI from 'openai';
+const { Configuration, OpenAIApi } = require('openai');
 
-const openai = new OpenAI({
+const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function generateScript(product) {
-  const prompt = `Create a short, curious and viral-sounding product review script for TikTok, YouTube Shorts, and Instagram Reels. Sound like a real person but professional. Mention the product name: ${product.name} and highlight: ${product.features.join(', ')}. End with a curiosity-driven CTA to check the link in bio.`;
+const openai = new OpenAIApi(configuration);
 
-  const completion = await openai.chat.completions.create({
+async function generateScript(product) {
+  const prompt = `Create a short, viral, conversational product video script for social media. Mention the product: ${product.name}, highlight: ${product.features.join(', ')}. End with "Check the link in bio."`;
+
+  const completion = await openai.createChatCompletion({
     model: "gpt-4o",
     messages: [{ role: "user", content: prompt }],
   });
 
-  return completion.choices[0].message.content.trim();
+  return completion.data.choices[0].message.content.trim();
 }
+
+module.exports = { generateScript };
