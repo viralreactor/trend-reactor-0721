@@ -1,8 +1,9 @@
 import { exec } from 'child_process';
 import fs from 'fs/promises';
-import { v2 as cloudinary } from 'cloudinary';
+import cloudinary from 'cloudinary';
 
-cloudinary.config({
+// Cloudinary Config (Make sure you add these to Vercel env variables)
+cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
@@ -10,25 +11,36 @@ cloudinary.config({
 
 export async function generateVideo(product, audioPath) {
   const output = `/tmp/${product.id}-video.mp4`;
-  const image = product.image;
+  const images = product.images;
+
+  if (!images || images.length === 0) {
+    throw new Error("Product must have at least one image in 'images' array");
+  }
+
+  const inputImages = images.map((img, idx) => `-loop 1 -t 5 -i ${img}`).join(' ');
+
+  const zooms = images.map((_, idx) => 
+    `[${idx}:v]scale=1080:1920,zoompan=z='min(zoom+0.0015,1.1)':d=125,setsar=1[img${idx}]`
+  ).join('; ');
+
+  const concatInputs = images.map((_, idx) => `[img${idx}]`).join('');
 
   const cmd = `
-    ffmpeg -loop 1 -i ${image} -i ${audioPath} -filter_complex "[0:v]zoompan=z='min(zoom+0.0015,1.5)':d=125[video]" -map "[video]" -map 1:a -t 30 -y ${output}
+    ffmpeg ${inputImages} -i ${audioPath} -filter_complex "${zooms}; ${concatInputs}concat=n=${images.length}:v=1:a=0[outv]" -map "[outv]" -map ${images.length}:a -y ${output}
   `;
 
   await new Promise((resolve, reject) => {
-    exec(cmd, (err) => (err ? reject(err) : resolve()));
+    exec(cmd, (err, stdout, stderr) => {
+      if (err) reject(err);
+      else resolve();
+    });
   });
 
-  return await uploadToCloudinary(output, product.id);
-}
-
-async function uploadToCloudinary(filePath, publicId) {
-  const res = await cloudinary.uploader.upload(filePath, {
-    resource_type: "video",
-    public_id: `trendreactor/${publicId}-${Date.now()}`,
-    overwrite: true,
+  // Upload to Cloudinary
+  const result = await cloudinary.v2.uploader.upload(output, {
+    resource_type: 'video',
+    folder: 'trend-reactor-videos'
   });
 
-  return res.secure_url; // This will be the video URL you send to Make.com
+  return result.secure_url;
 }
