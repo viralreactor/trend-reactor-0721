@@ -1,23 +1,15 @@
 [
   {
     "id": "product1",
-    "name": "Portable Blender",
-    "features": ["USB rechargeable", "6 stainless blades", "Easy to clean"],
-    "media": [
-      "https://your-host.com/image1.jpg",
-      "https://your-host.com/image2.jpg",
-      "https://your-host.com/demo1.mp4",
-      "https://your-host.com/demo2.mp4"
-    ]
-  },
-  {
-    "id": "product2",
-    "name": "LED Star Projector",
-    "features": ["Bluetooth speaker", "Multiple galaxy effects", "Remote control"],
-    "media": [
-      "https://your-host.com/star1.jpg",
-      "https://your-host.com/star2.jpg",
-      "https://your-host.com/star-demo.mp4"
-    ]
+    "name": "Magnetic Wireless Power Bank",
+    "features": ["MagSafe compatible", "5000mAh capacity", "Slim design"],
+    "images": [
+      "https://drive.google.com/uc?id=1tTQirCYBwrkEXzXX-kQ9JGhTViBtkt7r",
+      "https://drive.google.com/uc?id=1PG2K8FiohPUuCdjjRg_FBftaeoEPjPk7",
+      "https://drive.google.com/uc?id=197J_2jjlDdRqHcOaZzY9rXNwJ5wnKLMq",
+      "https://drive.google.com/uc?id=1bXscAo8cScI9oT4MjzHC0zYPVNuui2sh",
+      "https://drive.google.com/uc?id=13GXlbBRcKsUoa774--q4oAyycZgObti6"
+    ],
+    "affiliateLink": "https://amzn.to/414r4Du"
   }
 ]
